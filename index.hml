@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dino Runner - Game Khủng Long T-Rex</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container" id="gameContainer">
+    <!-- Hiển thị điểm -->
+    <div class="score-board">
+      HI <span id="highScore">00000</span> | <span id="currentScore">00000</span>
+    </div>
+
+    <!-- Mây & Mặt trời/Mặt trăng -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+
+    <!-- Nhân vật & Chướng ngại vật -->
+    <div class="dino" id="dino">
+      <div class="eye"></div>
+    </div>
+    <div class="cactus" id="cactus"></div>
+
+    <!-- Mặt đất -->
+    <div class="ground" id="ground"></div>
+
+    <!-- Màn hình thua -->
+    <div class="game-over" id="gameOverText">
+      <h2>GAME OVER</h2>
+      <p>Bấm Space hoặc chạm màn hình để chơi lại</p>
+    </div>
+  </div>
+
+  <!-- Tệp âm thanh từ CDN public -->
+  <audio id="soundJump" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+  <audio id="soundHit" src="https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3" preload="auto"></audio>
+  <audio id="soundScore" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
