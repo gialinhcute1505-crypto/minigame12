@@ -1,120 +1,132 @@
-const dino = document.getElementById('dino');
-const cactus = document.getElementById('cactus');
-const currentScoreDisplay = document.getElementById('currentScore');
-const highScoreDisplay = document.getElementById('highScore');
-const gameOverText = document.getElementById('gameOverText');
-const gameContainer = document.getElementById('gameContainer');
-
-const soundJump = document.getElementById('soundJump');
-const soundHit = document.getElementById('soundHit');
-const soundScore = document.getElementById('soundScore');
-
-let score = 0;
-let highScore = localStorage.getItem('dinoHighScore') || 0;
-let isGameOver = false;
-let scoreInterval = null;
-
-// Hiển thị kỷ lục ban đầu
-highScoreDisplay.innerText = String(highScore).padStart(5, '0');
-
-// Bắt đầu game
-function startGame() {
-  isGameOver = false;
-  score = 0;
-  currentScoreDisplay.innerText = '00000';
-  gameOverText.style.display = 'none';
-  gameContainer.classList.remove('night');
-  cactus.classList.add('move');
-
-  // Tính điểm theo thời gian
-  clearInterval(scoreInterval);
-  scoreInterval = setInterval(() => {
-    if (!isGameOver) {
-      score++;
-      currentScoreDisplay.innerText = String(score).padStart(5, '0');
-
-      // Phát âm thanh mỗi 100 điểm
-      if (score % 100 === 0 && score > 0) {
-        playSound(soundScore);
-      }
-
-      // Đổi giao diện Ngày / Đêm mỗi 300 điểm
-      if (score % 300 === 0 && score > 0) {
-        gameContainer.classList.toggle('night');
-      }
-    }
-  }, 100);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-// Nhảy
-function jump() {
-  if (isGameOver) {
-    startGame();
-    return;
-  }
+body {
+  background-color: #f7f7f7;
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  transition: background-color 1s ease, color 1s ease;
+}
 
-  if (!dino.classList.contains('jump')) {
-    dino.classList.add('jump');
-    playSound(soundJump);
+/* Chế độ đêm */
+body.night-mode {
+  background-color: #1a1a1a;
+  color: #f7f7f7;
+}
 
-    setTimeout(() => {
-      dino.classList.remove('jump');
-    }, 500);
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 800px;
+  padding: 10px;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.score-board {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  background-color: #ffffff;
+  border: 2px solid #535353;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transition: background-color 1s ease, border-color 1s ease;
+}
+
+body.night-mode .canvas-container {
+  background-color: #222222;
+  border-color: #888888;
+  box-shadow: 0 10px 20px rgba(255,255,255,0.05);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 250px;
+}
+
+.controls-hint {
+  display: flex;
+  gap: 15px;
+  font-size: 13px;
+  opacity: 0.8;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.key {
+  background: #e0e0e0;
+  color: #333;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+
+body.night-mode .key {
+  background: #444;
+  color: #fff;
+  border-color: #666;
+}
+
+/* Nút điều khiển mobile */
+.mobile-controls {
+  display: none;
+  width: 100%;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: flex;
   }
 }
 
-// Phát âm thanh
-function playSound(audio) {
-  audio.currentTime = 0;
-  audio.play().catch(() => {}); // Tránh bị chặn bởi chính sách Autoplay của trình duyệt
+.btn-action {
+  flex: 1;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: bold;
+  background: #535353;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  touch-action: manipulation;
 }
 
-// Kiểm tra va chạm (Collision Detection)
-const checkCollision = setInterval(() => {
-  if (isGameOver) return;
-
-  const dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue('bottom'));
-  const cactusRight = parseInt(window.getComputedStyle(cactus).getPropertyValue('right'));
-
-  // Khoảng cách va chạm giữa Khủng long và Xương rồng
-  if (cactusRight > 510 && cactusRight < 540 && dinoBottom < 55) {
-    endGame();
-  }
-}, 10);
-
-// Kết thúc trò chơi
-function endGame() {
-  isGameOver = true;
-  cactus.classList.remove('move');
-  clearInterval(scoreInterval);
-  playSound(soundHit);
-
-  // Hiệu ứng rung khung game
-  gameContainer.classList.add('shake');
-  setTimeout(() => gameContainer.classList.remove('shake'), 250);
-
-  // Cập nhật kỷ lục điểm (High Score)
-  if (score > highScore) {
-    highScore = score;
-    localStorage.setItem('dinoHighScore', highScore);
-    highScoreDisplay.innerText = String(highScore).padStart(5, '0');
-  }
-
-  gameOverText.style.display = 'block';
+.btn-action:active {
+  background: #333;
 }
-
-// Sự kiện điều khiển (Phím bấm & Cảm ứng di động)
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' || e.code === 'ArrowUp') {
-    e.preventDefault();
-    jump();
-  }
-});
-
-document.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  jump();
-}, { passive: false });
-
-// Tự động chạy khi tải trang
-startGame();
